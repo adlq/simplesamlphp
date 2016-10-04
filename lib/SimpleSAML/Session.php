@@ -338,10 +338,23 @@ class SimpleSAML_Session implements Serializable
                     'SimpleSAMLAuthToken'
                 );
                 if (!isset($_COOKIE[$authTokenCookieName])) {
-                    SimpleSAML_Logger::warning('Missing AuthToken cookie.');
-                    return null;
-                }
-                if ($_COOKIE[$authTokenCookieName] !== $session->authToken) {
+                    /*
+                     * If the corresponding cookie does not exist, fallback to
+                     * the corresponding url GET parameter.
+                     */
+                    $authTokenUrlParamName = $globalConfig->getString(
+                        'session.authtoken.urlparamname',
+                        'SimpleSAMLAuthToken'
+                    );
+                    if (!isset($_GET[$authTokenUrlParamName])) {
+                        SimpleSAML_Logger::warning('Missing AuthToken cookie and url parameter.');
+                        return null;
+                    }
+                    if ($_GET[$authTokenUrlParamName] !== $session->authToken) {
+                        SimpleSAML_Logger::warning('Invalid AuthToken url parameter.');
+                        return null;
+                    }
+                } else if ($_COOKIE[$authTokenCookieName] !== $session->authToken) {
                     SimpleSAML_Logger::warning('Invalid AuthToken cookie.');
                     return null;
                 }

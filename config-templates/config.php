@@ -366,11 +366,13 @@ $config = array(
     'session.phpsession.cookiename' => null,
     'session.phpsession.savepath' => null,
     'session.phpsession.httponly' => true,
+    'session.phpsession.urlparamname' => 'sid',
 
     /*
      * Option to override the default settings for the auth token cookie
      */
     'session.authtoken.cookiename' => 'SimpleSAMLAuthToken',
+    'session.authtoken.urlparamname' => 't',
 
     /*
      * Options for remember me feature for IdP sessions. Remember me feature

@@ -43,6 +43,7 @@ class SimpleSAML_SessionHandlerPHP extends SimpleSAML_SessionHandler
 
         $config = SimpleSAML_Configuration::getInstance();
         $this->cookie_name = $config->getString('session.phpsession.cookiename', null);
+        $this->url_param_name = $config->getString('session.phpsession.urlparamname', null);
 
         if (function_exists('session_status') && defined('PHP_SESSION_ACTIVE')) { // PHP >= 5.4
             $previous_session = session_status() === PHP_SESSION_ACTIVE;
@@ -175,11 +176,17 @@ class SimpleSAML_SessionHandlerPHP extends SimpleSAML_SessionHandler
     public function getCookieSessionId()
     {
         if (!self::hasSessionCookie()) {
-            return null; // there's no session cookie, can't return ID
+            if (!array_key_exists($this->url_param_name, $_GET)) {
+                return null; // there's no session cookie or url parameter, can't return ID
+            } else {
+                $sessionId = $_GET[$this->url_param_name];
+            }
+        } else {
+            $sessionId = $_COOKIE[$this->cookie_name];
         }
 
         // do not rely on session_id() as it can return the ID of a previous session. Get it from the cookie instead.
-        session_id($_COOKIE[$this->cookie_name]);
+        session_id($sessionId);
 
         $session_cookie_params = session_get_cookie_params();
 
